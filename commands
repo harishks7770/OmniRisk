@@ -1,0 +1,20 @@
+Open a separate terminal window for each of these commands and ensure your virtual environment (.venv) is activated in all of them.
+
+# TERMINAL 1: Start the Redis container for the Feast online feature store
+docker run -d --name feast-redis -p 6379:6379 redis
+
+# TERMINAL 2: Start the MLflow tracking server for model registry
+# (You can view the dashboard at [http://127.0.0.1:5000](http://127.0.0.1:5000))
+mlflow ui --backend-store-uri sqlite:///mlruns.db
+
+# TERMINAL 3: Launch the FastAPI inference engine
+# (You can view the API documentation at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs))
+uvicorn serve:app
+
+# TERMINAL 4: Launch the real-time Streamlit telemetry dashboard
+# (Automatically opens in your browser at http://localhost:8501)
+streamlit run app.py
+
+# TERMINAL 5: Execute the SciPy data drift monitor to evaluate feature health
+# (Prints the KS-Test P-Value and simulates the GitHub Actions retraining trigger)
+python drift_monitor.py
