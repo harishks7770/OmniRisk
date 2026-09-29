@@ -1,0 +1,13 @@
+# Prerequisites & Environment Setup
+
+Before starting the OmniRisk backend services, ensure your local development environment is fully configured.
+
+### 1. Required Software
+* **Python:** Version 3.10+ (Ensure your virtual environment is active)
+* **Docker:** Must be installed and running in the background (required for the Redis feature store).
+
+### 2. Install Dependencies
+Activate your virtual environment and install all required Python libraries:
+
+```bash
+pip install -r requirements.txt
