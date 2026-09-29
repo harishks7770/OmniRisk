@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7.2
+    container_name: omnirisk-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+
+  data-generator:
+    build: .
+    container_name: omnirisk-generator
+    command: python generator.py
+    volumes:
+      - ./data:/app/data
+
+  stream-processor:
+    build: .
+    container_name: omnirisk-spark
+    command: python stream_processor.py
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - redis

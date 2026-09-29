@@ -1,0 +1,26 @@
+name: Automated Model Retraining
+
+# Expose an automated retraining endpoint via GitHub Actions workflow (workflow_dispatch)[cite: 1]
+on:
+  workflow_dispatch:
+
+jobs:
+  retrain-omnirisk-model:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.14'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Execute Feast & Training Script
+        run: |
+          cd feast_repo && feast apply && cd ..
+          python train.py
