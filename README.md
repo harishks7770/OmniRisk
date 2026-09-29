@@ -23,6 +23,16 @@ Designed to mimic an enterprise financial security stack, this system utilizes a
 * **Data Health & Drift:** SciPy (Kolmogorov-Smirnov Test)
 
 ---
+Architecture Flow Explanation
+Data Ingestion & Feature Store: Raw synthetic transaction data is stored in Parquet micro-batches. Feast manages these features, pushing the latest aggregations (e.g., total_spend_1h, transaction_count_1h) into a Redis online store for ultra-low latency retrieval.
+
+Model Registry: An XGBoost classification model is trained and registered in MLflow, which tracks hyperparameter tuning, metrics, and versioning.
+
+Serving Layer: A FastAPI application receives real-time user IDs, fetches their latest spending metrics from Redis, evaluates them against the active MLflow model, and applies deterministic business-rule overrides for extreme anomalies.
+
+Telemetry Dashboard: A Streamlit frontend continuously polls the API, visualizing the live telemetry stream and isolating fraudulent transactions into a dedicated alert queue.
+
+Continuous Monitoring: A decoupled Python script uses SciPy (Kolmogorov-Smirnov Test) to monitor feature distributions. If significant data drift is detected (P-Value < 0.05), it triggers a simulated webhook to GitHub Actions for automated retraining.
 
 ## 🏗️ System Architecture
 
@@ -42,13 +52,4 @@ graph TD
     H -->|KS-Test Alert| I[GitHub Actions CI/CD Retraining]
 
 
-Architecture Flow Explanation
-Data Ingestion & Feature Store: Raw synthetic transaction data is stored in Parquet micro-batches. Feast manages these features, pushing the latest aggregations (e.g., total_spend_1h, transaction_count_1h) into a Redis online store for ultra-low latency retrieval.
 
-Model Registry: An XGBoost classification model is trained and registered in MLflow, which tracks hyperparameter tuning, metrics, and versioning.
-
-Serving Layer: A FastAPI application receives real-time user IDs, fetches their latest spending metrics from Redis, evaluates them against the active MLflow model, and applies deterministic business-rule overrides for extreme anomalies.
-
-Telemetry Dashboard: A Streamlit frontend continuously polls the API, visualizing the live telemetry stream and isolating fraudulent transactions into a dedicated alert queue.
-
-Continuous Monitoring: A decoupled Python script uses SciPy (Kolmogorov-Smirnov Test) to monitor feature distributions. If significant data drift is detected (P-Value < 0.05), it triggers a simulated webhook to GitHub Actions for automated retraining.
